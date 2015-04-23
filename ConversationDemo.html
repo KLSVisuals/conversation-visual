@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<meta http-equiv="Content-type" content="text/html"; charset="utf-8">
+
+<link href="conversationdemo.css" rel="stylesheet">
+
+<body>
+
+<div id="headerbox">
+<p><b>Radial Conversation Tree and Term Frequency Box</b><br>
+<p><b>(Data as of 4/13/15) [ BETA ]</b><br>
+<table><tr><td>   Module: <select id= "modselect">
+    <option value="modwhydigital">Why Digital</option>
+    <option value="modbusiness">Business</option>
+    <option value="modsummit">Summit</option>
+    <option value="moddata">Data</option>
+    </select></td>
+<td></td><td><div id="option">
+    <input name="ClearFilterButton" 
+           type="button" 
+           value="Clear Filters" 
+           onclick="ClearFilter()" />
+</div></td></tr></table>
+
+</div>
+<div id="brickchart">
+
+<form>
+  <table><tr><td>
+  <label><b><u>Frequency of Popular Terms</u></b></label>
+</td><td>
+  <label><input type="radio" name="mode" value="occurance">Number of Posts including Term</label><br>
+  <label><input type="radio" name="mode" value="frequency" checked>Term Frequency Across Module</label>
+</td>
+</table>
+</form>
+</div>
+
+<div id="radialgraph">
+
+</div>
+<div id="infoboxlabel"></div>
+<div id="infobox"></div>
+<div id="termboxlabel"></div>
+<div id="termbox"></div>
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+
+var jsontermbrickURL = "https://api.myjson.com/bins/16579";
+var jsonwhydigitalURL = "https://api.myjson.com/bins/24nhh";
+var jsonbusinessURL = "https://api.myjson.com/bins/3dnut";
+var jsonsummitURL = "https://api.myjson.com/bins/3k3c5";
+var jsondataURL = "https://api.myjson.com/bins/4vgl1"; 
+var jsonwhydigital, jsonbusiness, jsonsummit, jsondata;
+var titletip = "";
+var filtername = [];
+var filterterm = [];
+
+var color = d3.scale.category20();
+
+var diameter = 1700;
+
+var w = 600,
+    h = 600,
+    rx = w / 2,
+    ry = h / 2,
+    m0,
+    rotate = 0;
+
+var margin = {top: 20, right: 120, bottom: 20, left: 120},
+    //width = w, height = h;
+    width = diameter, height = diameter;
+    
+var i = 0,
+    duration = 350,
+    root;
+
+
+var tree = d3.layout.tree()
+    .size([360, diameter / 2 - 220])
+    .separation(function(a, b) { return (a.parent == b.parent ? 1 : 2) / a.depth; });
+
+var diagonal = d3.svg.diagonal.radial()
+    .projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
+
+var svg = d3.select("#radialgraph").append("svg")
+    .attr("id", "conversationtree")
+    .attr("width", width )
+    .attr("height", height )
+  .append("g")
+    .attr("transform", "translate(" + diameter / 2 + "," + diameter / 2 + ")");
+
+
+// tool tip addition
+var div = d3.select("#radialgraph").append("div")   
+    .attr("class", "tooltip")               
+    .style("opacity", 0);
+
+
+function ClearFilter() {
+  filtername = [];
+  filterterm = [];
+  updatefilterbox();
+  updatefiltertermbox();
+
+}
+
+function filtercheck(name, terms) {
+  var returnvalue = false;
+  
+  filtername.forEach(function(d) {
+    if(d == name) { returnvalue = true; }
+  })
+  
+
+  filterterm.forEach(function(d) {
+    nodeterms.forEach(function(t) {
+      if(d == t) { returnvalue = true; }        
+    })
+  })
+
+  return returnvalue;
+
+}
+
+// attempt to make infobox section
+
+var infolabel = d3.select("#infoboxlabel").append("text")
+      .text("Filter by Username");
+
+var info = d3.select("#infobox").append("text")
+      .attr("width", 200)
+      .attr("height", 400)
+      .attr("class", "infopaneldata")
+      .html('')
+      .append('ul')
+      .selectAll('li')
+      .data(filtername)
+        .enter().append('li')
+        .text(function(d) { return d; })
+      ;
+
+var termlabel = d3.select("#termboxlabel").append("text")
+      .text("Filter by Term Use");
+
+
+var term = d3.select("#termbox").append("text")
+      .attr("width", 200)
+      .attr("height", 400)
+      .attr("class", "termpaneldata")
+      .html('')
+      .append('ul')
+      .selectAll('li')
+      .data(filterterm)
+        .enter().append('li')
+        .text(function(d) { return d; })
+      ;
+
+
+// BRICK VARS
+var brickmargin = {top: 0, right: 0, bottom: 0, left: 0},
+    brickwidth = 450 - brickmargin.left - brickmargin.right,
+    brickheight = 400 - brickmargin.top - brickmargin.bottom;
+    
+
+var brickcolor = d3.scale.category20b();
+
+var bricktooltiphtml = "";
+var modulename = "modwhydigital";
+var freqstatus = "frequency";
+var titletip = 0;
+
+var treemap = d3.layout.treemap()
+    .size([brickwidth, brickheight])
+    .sticky(true)
+    .value(function(d) { return d.modwhydigital; })
+    .sort(function(a,b) { return a.value - b.value; })
+    ;
+
+var brickdiv = d3.select("#brickchart").append("div")
+    .style("position", "relative")
+    .style("width", (brickwidth + brickmargin.left + brickmargin.right) + "px")
+    .style("height", (brickheight + brickmargin.top + brickmargin.bottom) + "px")
+    .style("left", brickmargin.left + "px")
+    .style("top", brickmargin.top + "px");
+
+var bricktooltip = d3.select("#brickchart").append("div")
+     .attr('class','bricktooltip')
+     .style("visibility", "hidden")
+     .style("background-color", "#ffffff");
+
+
+//ATTEMPT TO LAYER THE BRICK CHART INTO THE PAGE
+
+ d3.json(jsontermbrickURL, function(error, root) {
+  var bricknode = brickdiv.datum(root).selectAll(".node")
+      .data(treemap.nodes)
+    .enter().append("div")
+      .attr("class", "bricknode")
+      .call(position)
+      .style("background", function(d) { return brickcolor(d.category); })
+      .text(function(d) { return d.children ? null : d.name; })      
+      .on("mouseover", function(d) {
+            if (modulename == "modwhydigital") { bricktooltip.html("<b><u>" + d.name + "</u></b><br>" + "Posts using term: " + d.modwhydigital + "<br>" + "Frequency (<i>all posts</i>): " + d.modallwhydigital + "<br>" + "Category: <b>" + d.category + "</b>"); }
+            else if (modulename == "modbusiness") { bricktooltip.html("<b><u>" + d.name + "</u></b><br>" + "Posts using term: " + d.modbusiness + "<br>" + "Frequency (<i>all posts</i>): " + d.modallbusiness + "<br>" + "Category: <b>" + d.category + "</b>"); }
+            else if (modulename == "modsummit") { bricktooltip.html("<b><u>" + d.name + "</u></b><br>" + "Posts using term: " + d.modsummit + "<br>" + "Frequency (<i>all posts</i>): " + d.modallsummit + "<br>" + "Category: <b>" + d.category + "</b>");  }
+            else {  bricktooltip.html("<b><u>" + d.name + "</u></b><br>" + "Posts using term: " + d.moddata + "<br>" + "Frequency (<i>all posts</i>): " + d.modalldata + "<br>" + "Category: <b>" + d.category + "</b>"); }  //moddata
+
+
+         //bricktooltip.html("<b><u>" + d.name + "</u></b><br>" + "Posts using term: " + d.modwhydigital + "<br>" + "Frequency (<i>all posts</i>): " + d.modallwhydigital + "<br>" + "Category: <b>" + d.category + "</b>");
+         bricktooltip.style("visibility", "visible");
+         //this.style.cursor = "hand";
+         })
+       .on("click", function(d) { updatefilterterm(d.name); return d.name;} )
+       .on("mousemove", function(){
+         bricktooltip
+         .style("top", (d3.event.pageY)+"px")
+         .style("left",(d3.event.pageX/2.4)+"px");
+         })
+       .on("mouseout", function(){
+         bricktooltip.style("visibility", "hidden");
+         })
+       .on('contextmenu', function(d,i) {
+          // create the div element that will hold the context menu
+          d3.selectAll('.d3-context-menu').data([1])
+            .enter()
+            .append('div')
+            .attr('class', 'd3-context-menu');
+          // close menu
+          d3.select('#brickchart').on('click.d3-context-menu', function() {
+            d3.select('.d3-context-menu').style('display', 'none');
+          });
+          d3.select('#radialgraph').on('click.d3-context-menu', function() {
+            d3.select('.d3-context-menu').style('display', 'none');
+          });
+          d3.select('#infobox').on('click.d3-context-menu', function() {
+            d3.select('.d3-context-menu').style('display', 'none');
+          });
+          d3.select('#termbox').on('click.d3-context-menu', function() {
+            d3.select('.d3-context-menu').style('display', 'none');
+          });
+          d3.select('#headerbox').on('click.d3-context-menu', function() {
+            d3.select('.d3-context-menu').style('display', 'none');
+          });
+
+          // this gets executed when a contextmenu event occurs
+                
+              if (modulename == "modwhydigital") { brickcontext(d.usagewhydigital); }
+              else if (modulename == "modbusiness") { brickcontext(d.usagebusiness); }
+              else if (modulename == "modsummit") { brickcontext(d.usagesummit); }
+              else { brickcontext(d.usagedata); }
+
+
+          d3.select('.d3-context-menu').style('display', 'none');
+              
+          // show the context menu
+          d3.select('.d3-context-menu')
+            .style('left', (d3.event.pageX - 2) + 'px')
+            .style('top', (d3.event.pageY - 2) + 'px')
+            .style('display', 'block');
+          d3.event.preventDefault();
+        })
+      ;
+
+
+      d3.selectAll("input").on("change", function change() {
+        var value = this.value === "occurance"
+            ? function(d) { 
+              if (modulename == "modwhydigital") { return d.modwhydigital; }
+              else if (modulename == "modbusiness") { return d.modbusiness; }
+              else if (modulename == "modsummit") {  return d.modsummit; }
+              else { return d.moddata;  }  //moddata
+             }
+            : function(d) {
+              if (modulename == "modwhydigital") { return d.modallwhydigital; }
+              else if (modulename == "modbusiness") { return d.modallbusiness; }
+              else if (modulename == "modsummit") {  return d.modallsummit; }
+              else { return d.modalldata;  }  //moddata
+           };
+        
+        freqstatus = this.value;
+        bricknode
+            .data(treemap.value(value).nodes)
+          .transition()
+            .duration(1500)
+            .call(position);
+      });
+
+
+      function brickcontext(usage){
+
+          d3.selectAll('.d3-context-menu')
+            .html('<b>User</b> -- (mentions)</u>')
+            .append('ul')
+            .selectAll('li')
+              //.data(d.usagewhydigital).enter()
+              .data(usage).enter()
+              .append('li')
+              // NAME SELECTION EVENT ATTEMPT
+              .on('click' , function(d) { updatefiltername(d.user); return d.user; })
+              .text(function(d) { return d.user + " -- (" + d.freq + ")"; } );
+      }
+
+
+  });
+
+
+function position() {
+  
+  this.style("left", function(d) { return d.x + "px"; })
+      .style("top", function(d) { return d.y + "px"; })
+      .style("width", function(d) { return Math.max(0, d.dx - 1) + "px"; })
+      .style("height", function(d) { return Math.max(0, d.dy - 1) + "px"; });
+}
+
+
+// THIS IS WHERE THE RADIAL ACTION STARTS
+  
+d3.json(jsonwhydigitalURL, function(error, root) {
+    update(root);
+    d3.select(self.frameElement).style("height", "800px");
+});
+
+d3.json(jsonwhydigitalURL, function(error, root) {
+  jsonwhydigital = root;
+});
+
+d3.json(jsonbusinessURL, function(error, root) {
+  jsonbusiness = root;
+});
+
+d3.json(jsonsummitURL, function(error, root) {
+  jsonsummit = root;
+});
+
+d3.json(jsondataURL, function(error, root) {
+  jsondata = root;
+});
+
+
+function update(source) {
+
+  // Compute the new tree layout.
+  var nodes = tree.nodes(source),
+      links = tree.links(nodes);
+
+  // Normalize for fixed-depth.
+   nodes.forEach(function(d) { d.y = d.depth * 240; }); 
+  //nodes.forEach(function(d) { d.y = d.depth * 100; });
+
+  // Update the nodes…
+  var node = svg.selectAll("g.node")
+      .data(nodes, function(d) { return d.id || (d.id = ++i); });
+
+  // Enter any new nodes at the parent's previous position.
+  var nodeEnter = node.enter().append("g")
+      .attr("class", "node")
+      .on('contextmenu', function(d,i) {
+          // create the div element that will hold the context menu
+          d3.selectAll('.d3-context-menu').data([1])
+            .enter()
+            .append('div')
+            .attr('class', 'd3-context-menu');
+          // close menu
+          d3.select('#radialgraph').on('click.d3-context-menu', function() {
+            d3.select('.d3-context-menu').style('display', 'none');
+          });
+          // this gets executed when a contextmenu event occurs
+          d3.selectAll('.d3-context-menu')
+            .html('')
+            .append('ul')
+            .selectAll('li')
+              .data(d.terms).enter()
+              .append('li')
+              // TERM SELECTION EVENT ATTEMPT
+              .on('click' , function(d) { updatefilterterm(d.termname); return d.termname; })
+              .text(function(d) { return d.termname;});
+          d3.select('.d3-context-menu').style('display', 'none');
+              
+          // show the context menu
+          d3.select('.d3-context-menu')
+            .style('left', (d3.event.pageX - 2) + 'px')
+            .style('top', (d3.event.pageY - 2) + 'px')
+            .style('display', 'block');
+          d3.event.preventDefault();
+      })
+      // Attempt to preserve filtering between transitions
+      .style("opacity", function(d) { 
+          // if everything is empty reveal everything
+        if ( filtername.length + filterterm.length == 0 )  { return 1; };
+        nodeterms = d3.entries(d.terms).map(function(d){ return d.value.termname });
+          if(filtercheck(d.name, nodeterms) == true) { return 1; }
+          else { return 0.2; }
+        })
+      ;
+
+  nodeEnter.append("circle")
+      .attr("r", 1e-5)
+      .on("mouseover", function(d) { 
+          if (d.name == "") {}
+          else {  
+            d3.select(this).attr("r", 20);
+            if (d.title) { titletip = d.title.substr(0,30) + "..."; tipheightbump = 14; } else { titletip = ""; tipheightbump = 0;}
+              div.transition()        
+                  .duration(200)      
+                  .style("opacity", .9);
+              if(d.likes > 0) {
+                if(d.updates > 0) { 
+                    div .html("<b><u>" + d.name + "</u></b></br>" +  titletip  + "</br>"  + "Likes: " + d.likes + "</br>" + "Updates: " + d.updates)
+                    .style("height", (42 + tipheightbump) + "px")
+                    .style("left", (d3.event.pageX - 580) + "px" )
+                    .style("top", (d3.event.pageY)/1.1 + "px")
+                    ;
+                }
+                else {
+                    div .html("<b><u>" + d.name + "</u></b></br>" +  titletip + "</br>" + "Likes: " + d.likes)
+                    .style("height", (28 + tipheightbump) + "px")
+                    .style("left", (d3.event.pageX - 580) + "px" )
+                    .style("top", (d3.event.pageY)/1.1 + "px")
+                    ;
+                }
+              }
+              else {
+                if(d.updates > 0) {
+                     div .html("<b><u>" + d.name + "</u></b></br>" +  titletip + "</br>" + "Updates: " + d.updates)
+                    .style("height", (28 + tipheightbump) + "px")
+                    .style("left", (d3.event.pageX - 580) + "px" )
+                    .style("top", (d3.event.pageY)/1.1 + "px")
+                    ;
+                  }
+                else {
+                    div .html("<b><u>" + d.name + "</u></b></br>" +  titletip)
+                    .style("height", (14 + tipheightbump) + "px")
+                    .style("left", (d3.event.pageX - 580) + "px" )
+                    .style("top", (d3.event.pageY)/1.1 + "px")
+                    ;
+
+                }
+              }
+            }
+          })
+      .on("mouseout", function(d)  { d3.select(this).attr("r",  6); })
+      .on("click", function(d) { 
+        if (d.name == "") {}
+        else { click(d.name); }
+      })
+      .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+
+  nodeEnter.append("a")
+    .attr("target","_blank")
+		.attr("xlink:href", function(d){return d.url;} )  // <-- reading the new "url" property
+
+	.append("text")
+      .attr("dy", ".35em")
+      .attr("x", 20)
+      .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
+      .attr("transform", function(d) { return d.x < 180 ? "translate(" + d.name.length + ")" : "rotate(180)translate(-" + (d.name.length + 50)  + ")"; })
+      .text(function(d) { return d.name; })
+	  //attempt at mouseover data on radial
+		.on("mouseover", function(d) {      
+	         if (d.title) { titletip = d.title.substr(0,30) + "..."; tipheightbump = 14; } else { titletip = ""; tipheightbump = 0;}
+            div.transition()        
+  	            .duration(200)      
+  	            .style("opacity", .9);
+            if(d.likes > 0) {
+              if(d.updates > 0) { 
+                  div .html("<b><u>" + d.name + "</u></b></br>" +  titletip  + "</br>"  + "Likes: " + d.likes + "</br>" + "Updates: " + d.updates)
+                  .style("height", (42 + tipheightbump) + "px")
+                  .style("left", (d3.event.pageX - 580) + "px" )
+                  .style("top", (d3.event.pageY)/1.1 + "px")
+              }
+              else {
+                  div .html("<b><u>" + d.name + "</u></b></br>" +  titletip + "</br>" + "Likes: " + d.likes)
+                  .style("height", (28 + tipheightbump) + "px")
+                  .style("left", (d3.event.pageX - 580) + "px" )
+                  .style("top", (d3.event.pageY)/1.1 + "px")
+              }
+            }
+            else {
+              if(d.updates > 0) {
+                   div .html("<b><u>" + d.name + "</u></b></br>" +  titletip + "</br>" + "Updates: " + d.updates)
+                  .style("height", (28 + tipheightbump) + "px")
+                  .style("left", (d3.event.pageX - 580) + "px" )
+                  .style("top", (d3.event.pageY)/1.1 + "px")
+                }
+              else {
+                  div .html("<b><u>" + d.name + "</u></b></br>" +  titletip)
+                  .style("height", (14 + tipheightbump) + "px")
+                  .style("left", (d3.event.pageX - 580) + "px" )
+                  .style("top", (d3.event.pageY)/1.1 + "px")
+
+              }
+            }
+          
+	        })                  
+	    .on("mouseout", function(d) {       
+	        div.transition()        
+	            .duration(500)      
+	            .style("opacity", 0);
+          //div.html("");   
+	        })
+      .style("fill-opacity", 1e-6);
+		
+  // Transition nodes to their new position.
+  var nodeUpdate = node.transition()
+      .duration(duration)
+      .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; })
+
+  nodeUpdate.select("circle")
+      .attr("r", function(d) {  if (d.name == "") { return 1e-5; } else { return 6.0; } })
+      //.style("fill", function(d) { return color(d.industry); });
+      .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; })
+      ;
+          
+  nodeUpdate.select("text")
+      .style("fill-opacity", 1)
+      .attr("transform", function(d) { return d.x < 180 ? "translate(" + d.name.length + ")" : "rotate(180)translate(-" + (d.name.length + 50)  + ")"; });
+
+  // TODO: appropriate transform
+  var nodeExit = node.exit().transition()
+      .duration(duration)
+      .remove();
+
+  nodeExit.select("circle")
+      .attr("r", 1e-6);
+
+  nodeExit.select("text")
+      .style("fill-opacity", 1e-6);
+
+  // Update the links…
+  var link = svg.selectAll("path.link")
+      .data(links, function(d) { return d.target.id; });
+
+  // Enter any new links at the parent's previous position.
+  link.enter().insert("path", "g")
+      .attr("class", "link")
+  // SOMETHING ABOUT THIS CODE THROWS AN INVALID PATH ERROR SO I CUT IT OUT
+  //    .attr("d", function(d) {
+  //      var o = {x: source.x0, y: source.y0};
+  //      return diagonal({source: o, target: o});
+  //    })
+      ;
+
+  // Transition links to their new position.
+  link.transition()
+      .duration(duration)
+      .attr("d", diagonal);
+
+  // Transition exiting nodes to the parent's new position.
+  link.exit().transition()
+      .duration(duration)
+      .attr("d", function(d) {
+        var o = {x: source.x, y: source.y};
+        return diagonal({source: o, target: o});
+      })
+      .remove();
+
+  // Stash the old positions for transition.
+  nodes.forEach(function(d) {
+    d.x0 = d.x;
+    d.y0 = d.y;
+  });
+
+
+    // single click
+    function click(name) {
+      updatefiltername(name);
+      }
+
+
+}
+
+
+
+
+
+d3.select(self.frameElement).style("height", diameter - 150 + "px");
+
+d3.select("#modselect").on("change", function() {
+
+        modulename = this.value;
+
+        if (freqstatus == "occurance") {
+          if (modulename == "modwhydigital") { 
+              d3.select("#brickchart").selectAll(".bricknode").data(treemap.value(function(d) { return d.modallwhydigital; } ).nodes).transition().duration(1500).call(outposition); 
+              update(jsonwhydigital);
+              
+            }
+          else if (modulename == "modbusiness") { 
+              d3.select("#brickchart").selectAll(".bricknode").data(treemap.value(function(d) { return d.modallbusiness; } ).nodes).transition().duration(1500).call(outposition);
+              update(jsonbusiness);
+              
+           }
+          else if (modulename == "modsummit") { 
+              d3.select("#brickchart").selectAll(".bricknode").data(treemap.value(function(d) { return d.modallsummit; } ).nodes).transition().duration(1500).call(outposition); 
+              update(jsonsummit); 
+              
+          }
+          else {
+              d3.select("#brickchart").selectAll(".bricknode").data(treemap.value(function(d) { return d.modalldata; } ).nodes).transition().duration(1500).call(outposition); 
+              update(jsondata); 
+              
+          }
+
+        }
+        else {
+          if (modulename == "modwhydigital") { 
+              d3.select("#brickchart").selectAll(".bricknode").data(treemap.value(function(d) { return d.modwhydigital; } ).nodes).transition().duration(1500).call(outposition); 
+              update(jsonwhydigital); 
+              
+            }
+          else if (modulename == "modbusiness") { 
+              d3.select("#brickchart").selectAll(".bricknode").data(treemap.value(function(d) { return d.modbusiness; } ).nodes).transition().duration(1500).call(outposition); 
+              update(jsonbusiness);
+              
+            }
+          else if (modulename == "modsummit") { 
+              d3.select("#brickchart").selectAll(".bricknode").data(treemap.value(function(d) { return d.modsummit; } ).nodes).transition().duration(1500).call(outposition); 
+              update(jsonsummit); 
+              
+            }
+          else {
+            d3.select("#brickchart").selectAll(".bricknode").data(treemap.value(function(d) { return d.moddata; } ).nodes).transition().duration(1500).call(outposition); 
+            update(jsondata);
+            
+            }
+        }
+
+      });
+
+function outposition() {
+  
+  this.style("left", function(d) { return d.x + "px"; })
+      .style("top", function(d) { return d.y + "px"; })
+      .style("width", function(d) { return Math.max(0, d.dx - 1) + "px"; })
+      .style("height", function(d) { return Math.max(0, d.dy - 1) + "px"; });
+}
+
+
+// filter array work
+
+function updatefiltername(name) {
+        
+    var filtercopy = [];
+    var removefromfilter = false;
+
+    filtername.forEach(function(d) {
+      if(d == name) { removefromfilter = true; }
+      else {  filtercopy.push(d); }
+    })
+
+    if(removefromfilter == true) {
+    // Entry found therefore replace array with repushed copy
+      filtername = filtercopy;
+    }
+    else {
+    // Entry not found therefore insert into filter
+      filtername.push(name);
+    }
+
+    updatefilterbox();
+
+
+}
+
+
+// attempting to filter on selected
+
+function updatefilterbox() {
+    d3.selectAll("#infobox")
+      .selectAll('li').remove;
+    d3.selectAll("#infobox")
+      .html('')
+     .append('ul')
+      .selectAll('li')
+      .data(filtername)
+        .enter().append('li')
+        .on('click' , function(d) { updatefiltername(d); return d; })
+        .text(function(d) { return d;});
+
+    highlight();
+
+
+
+}
+
+
+// attempting to filter on selected term
+
+// FILTER TERMLIST WORK
+
+function updatefilterterm(term) {
+
+    var filtertermcopy = [];
+    var removefromfilterterm = false;
+
+    filterterm.forEach(function(d) {
+      if(d == term) { removefromfilterterm = true; }
+      else {  filtertermcopy.push(d); }
+    })
+
+    if(removefromfilterterm == true) {
+    // Entry found therefore replace array with repushed copy
+      filterterm = filtertermcopy;
+    }
+    else {
+    // Entry not found therefore insert into filter
+      filterterm.push(term);
+    }
+
+    updatefiltertermbox();
+
+
+}
+
+
+
+function updatefiltertermbox() {
+    d3.selectAll("#termbox")
+      .selectAll('li').remove;
+    d3.selectAll("#termbox")
+      .html('')
+     .append('ul')
+      .selectAll('li')
+      .data(filterterm)
+        .enter().append('li')
+        .on('click' , function(d) { updatefilterterm(d); return d; })
+        .text(function(d) { return d;});
+
+    highlight();
+
+    //resizetermbox(filterterm.length);
+
+}
+
+function highlight() {
+        
+  
+  // if everything is empty reveal everything
+  if ( filtername.length + filterterm.length == 0 )  { d3.selectAll("g.node").each(function(d) {d3.select(this).transition().style("opacity", 1); }) }
+  else {
+  // loop through terms and names for each node
+ 
+      d3.selectAll("g.node")
+        .each(function(d) {
+          nodeterms = d3.entries(d.terms).map(function(d){ return d.value.termname });
+          if(filtercheck(d.name, nodeterms) == true) {
+            // opacity 1
+            d3.select(this).transition().style("opacity", 1);
+
+
+           if (d.children) {
+              d._children = d.children;
+              d.children = null;
+            }
+            // else {
+            //  d.children = d._children;
+            //  d._children = null;
+            //}
+            //update(d);
+  
+          }
+          else {
+            // opacity .2
+            d3.select(this).transition().style("opacity", .2);
+          }
+
+      })
+  }
+  
+
+
+
+}
+
+</script>
+
