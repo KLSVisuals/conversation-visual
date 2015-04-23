@@ -1,0 +1,218 @@
+
+.brickbody {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  margin: auto;
+  position: relative;
+  width: 960px;
+}
+
+.brickform {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+
+.bricktooltip {
+   position: absolute;
+   border:1px solid;
+   margin:10px;
+   padding: 6px;
+   opacity: 0.9;
+   z-index: 1000;
+}
+
+
+.fixedbricktooltip {}
+
+.bricknode {
+  border: solid 1px white;
+  font: 12px sans-serif;
+  line-height: 12px;
+  overflow: hidden;
+  position: absolute;
+  text-indent: 2px;
+}
+
+#headerbox {
+  position: absolute;
+  top: 1px;
+  left: 10px;
+  width: 450px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+
+}
+
+#brickchart {
+  position: absolute;
+  top: 100px;
+  left: 10px;
+  width: 450px;
+}
+
+#radialgraph {    
+  position:absolute;
+  top: 10px;
+  left:480px;
+  
+   
+}
+
+#zoomboxlabel {
+  position:absolute;
+  top:570px;
+  left:10px;
+  width:200px;
+  height: 20px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  border: 0px;  
+}
+
+
+#zoombox {
+  position: absolute;
+  top: 590px;
+  left: 10px;
+  width:  450px;
+  height: 600px;
+  border: 1px solid #d4d4d4;
+}
+
+
+#infoboxlabel {
+  position:absolute;
+  top:570px;
+  left:10px;
+  width:200px;
+  height: 20px;
+  border: 0px;
+}
+
+#infobox {
+  position:absolute;
+  top:590px;
+  left:10px;
+  width:200px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  border: 1px solid #d4d4d4;
+}
+
+#infobox ul {
+  list-style-type: none;
+  margin: 4px 0px;
+  padding: 0px;
+  cursor: default;
+}
+
+#infobox ul li {
+  padding: 4px 16px;
+}
+
+#infobox ul li:hover {
+  background-color: #4677f8;
+  color: #fefefe;
+}
+
+#termboxlabel {
+  position:absolute;
+  top:570px;
+  left:220px;
+  width:200px;
+  height: 20px;
+  border: 0px;
+}
+
+#termbox {
+  position:absolute;
+  top:590px;
+  left:220px;
+  width:200px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  border: 1px solid #d4d4d4;
+}
+
+
+
+#termbox ul {
+  list-style-type: none;
+  margin: 4px 0px;
+  padding: 0px;
+  cursor: default;
+}
+
+#termbox ul li {
+  padding: 4px 16px;
+}
+
+#termbox ul li:hover {
+  background-color: #4677f8;
+  color: #fefefe;
+}
+
+
+.d3-context-menu {
+  position: absolute;
+  display: none;
+  background-color: #f2f2f2;
+  border-radius: 4px;
+
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  min-width: 150px;
+  border: 1px solid #d4d4d4;
+
+  z-index:1200;
+}
+
+.d3-context-menu ul {
+  list-style-type: none;
+  margin: 4px 0px;
+  padding: 0px;
+  cursor: default;
+}
+
+.d3-context-menu ul li {
+  padding: 4px 16px;
+}
+
+.d3-context-menu ul li:hover {
+  background-color: #4677f8;
+  color: #fefefe;
+}
+
+.node {
+  cursor: pointer;
+}
+
+.node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+.node text {
+  font: 10px sans-serif;
+}
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1.5px;
+}
+
+
+.tooltip {   
+  position: absolute;           
+  text-align: left;           
+  width: 200px;                  
+  padding: 4px;             
+  font: 12px sans-serif;        
+  background: lightsteelblue;   
+  border: 0px;      
+  border-radius: 8px;           
+  pointer-events: none; 
+   
+}
