@@ -46,11 +46,11 @@
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script>
 
-var jsontermbrickURL = "https://api.myjson.com/bins/16579";
-var jsonwhydigitalURL = "https://api.myjson.com/bins/24nhh";
-var jsonbusinessURL = "https://api.myjson.com/bins/3dnut";
-var jsonsummitURL = "https://api.myjson.com/bins/3k3c5";
-var jsondataURL = "https://api.myjson.com/bins/4vgl1"; 
+var jsontermbrickURL = "https://api.myjson.com/bins/57ba5";
+var jsonwhydigitalURL = "https://api.myjson.com/bins/4wlh9";
+var jsonbusinessURL = "https://api.myjson.com/bins/spel";
+var jsonsummitURL = "https://api.myjson.com/bins/1ga65";
+var jsondataURL = "https://api.myjson.com/bins/2pajh"; 
 var jsonwhydigital, jsonbusiness, jsonsummit, jsondata;
 var titletip = "";
 var filtername = [];
@@ -78,7 +78,7 @@ var i = 0,
 
 var tree = d3.layout.tree()
     .size([360, diameter / 2 - 220])
-    .separation(function(a, b) { return (a.parent == b.parent ? 1 : 2) / a.depth; });
+    .separation(function(a, b) { return 3; }); // (a.parent == b.parent ? 1 : 2) / a.depth; });
 
 var diagonal = d3.svg.diagonal.radial()
     .projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
