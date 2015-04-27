@@ -1,6 +1,198 @@
+@import url('normalize.css');
+@import url('http://fonts.googleapis.com/css?family=Open+Sans:400,600,300'); \
 
+
+/* Basics */
+
+body {
+  font-family: 'Open Sans',"Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  /*color: #333333;*/
+}
+
+h1 {
+  margin: 1.5em auto .3em;
+}
+
+select {
+  
+  font-family: 'Open Sans', Arial, sans-serif;
+  font-size: 16px;
+  width: 100%;
+  height: 32px;
+  border-radius: 0;
+
+  background: #333;
+  color: #ffffff;
+}
+
+button {
+  width: 100%;
+  padding: 5px;
+  margin: 5px;
+  font-family: 'Open Sans', Arial, sans-serif;
+  font-size: 16px;
+
+
+}
+
+/* Header and Title Content */
+
+/** Module selections **/
+
+.moduleselect {
+
+  width: 36%;
+  margin: auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+
+}
+
+.dropdowntitle {
+  margin: auto;
+  flex-grow: 1;
+  align-content: center;
+  vertical-align: bottom;
+}
+
+.dropdown {
+
+  margin: 5px auto;
+  flex-grow: 2;
+
+  vertical-align: bottom;
+
+}
+
+#headerbox {
+  margin: 0 auto;
+
+  width: 100%;
+  text-align: center;
+
+  clear: both;
+}
+
+
+/* Visualizations and Filters */
+
+#viz {
+
+  margin: 25px;
+  padding: 5px;
+
+  display: inline-block;
+
+}
+
+/** Filter Specifications **/
+
+.filteredterms {
+
+  padding: 5px;
+  float: left;
+  clear: both;
+
+}
+
+.brickchartpostsorting {
+
+   margin: 0 13px; 
+   
+
+   float: left;
+   
+
+   /* display: inline-table; */
+}
+
+.title p {
+  margin: 0 auto 1.5em;
+}
+
+
+.frequencyfilters {
+  float: left;
+  clear: both;
+  border-bottom: 1px solid #d4d4d4;
+}
+
+#infoboxlabel {
+/*   position:absolute; 
+   top:570px; 
+   left:10px; */
+   /* width:200px; */ 
+   /* height: 20px; */ 
+  
+   /* border-bottom: 1px solid #999; */
+   /* text-decoration: underline; */
+   font-weight: 800;
+}
+
+#infobox {
+
+  border-bottom: 1px solid #d4d4d4; 
+  margin-bottom: 20px;
+
+}
+
+#infobox ul {
+  list-style-type: none;
+  margin: 4px 0px;
+  padding: 0px;
+  cursor: default;
+}
+
+#infobox ul li {
+  padding: 4px 16px;
+  border: 1px solid #999999;
+  margin-bottom: 5px;
+}
+
+#infobox ul li:hover {
+  background-color: #4677f8;
+  color: #fefefe;
+}
+
+#termboxlabel {
+  /* position:absolute; */
+  /* top:570px; */
+  /* left:220px; */
+  /* width:200px; */
+  /* height: 20px; */
+  /* border: 0px; */
+  /* text-decoration: underline; */
+  font-weight: 800;
+}
+
+#termbox {
+ 
+  border-bottom: 1px solid #d4d4d4;
+}
+
+#termbox ul {
+  list-style-type: none;
+  margin: 4px 0px;
+  padding: 0px;
+  cursor: default;
+}
+
+#termbox ul li {
+  padding: 4px 16px;
+  border: 1px solid #999999;
+  margin-bottom: 5px;
+}
+
+#termbox ul li:hover {
+  background-color: #4677f8;
+  color: #fefefe;
+  border: 1px solid #333333;
+}
+
+/* Treemap Viz */
 .brickbody {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   margin: auto;
   position: relative;
   width: 960px;
@@ -22,40 +214,34 @@
 }
 
 
-.fixedbricktooltip {}
-
 .bricknode {
-  border: solid 1px white;
-  font: 12px sans-serif;
-  line-height: 12px;
+
+  border: solid 2px white;
+  font-size: 10px;
   overflow: hidden;
   position: absolute;
-  text-indent: 2px;
-}
+  
 
-#headerbox {
-  position: absolute;
-  top: 1px;
-  left: 10px;
-  width: 450px;
-  font-family: Arial, sans-serif;
-  font-size: 14px;
 
 }
 
-#brickchart {
-  position: absolute;
-  top: 100px;
-  left: 10px;
-  width: 450px;
+#brickchart {   
+  left: 10px; 
+  display: inline-block;
+  float: left; 
+  margin: auto;
+  max-width: 70%;
 }
+
+/** Conversation Tree **/
 
 #radialgraph {    
-  position:absolute;
-  top: 10px;
-  left:480px;
-  
-   
+ 
+  float: left;
+  clear: both;
+  margin-top: 2em;
+  /* align-self: flex-end; */
+
 }
 
 #zoomboxlabel {
@@ -64,7 +250,7 @@
   left:10px;
   width:200px;
   height: 20px;
-  font-family: Arial, sans-serif;
+  font-family: 'Open Sans', Arial, sans-serif;
   font-size: 14px;
   border: 0px;  
 }
@@ -79,92 +265,22 @@
   border: 1px solid #d4d4d4;
 }
 
-
-#infoboxlabel {
-  position:absolute;
-  top:570px;
-  left:10px;
-  width:200px;
-  height: 20px;
-  border: 0px;
-}
-
-#infobox {
-  position:absolute;
-  top:590px;
-  left:10px;
-  width:200px;
-  font-family: Arial, sans-serif;
-  font-size: 14px;
-  border: 1px solid #d4d4d4;
-}
-
-#infobox ul {
-  list-style-type: none;
-  margin: 4px 0px;
-  padding: 0px;
-  cursor: default;
-}
-
-#infobox ul li {
-  padding: 4px 16px;
-}
-
-#infobox ul li:hover {
-  background-color: #4677f8;
-  color: #fefefe;
-}
-
-#termboxlabel {
-  position:absolute;
-  top:570px;
-  left:220px;
-  width:200px;
-  height: 20px;
-  border: 0px;
-}
-
-#termbox {
-  position:absolute;
-  top:590px;
-  left:220px;
-  width:200px;
-  font-family: Arial, sans-serif;
-  font-size: 14px;
-  border: 1px solid #d4d4d4;
-}
-
-
-
-#termbox ul {
-  list-style-type: none;
-  margin: 4px 0px;
-  padding: 0px;
-  cursor: default;
-}
-
-#termbox ul li {
-  padding: 4px 16px;
-}
-
-#termbox ul li:hover {
-  background-color: #4677f8;
-  color: #fefefe;
-}
-
-
 .d3-context-menu {
   position: absolute;
   display: none;
   background-color: #f2f2f2;
   border-radius: 4px;
 
-  font-family: Arial, sans-serif;
-  font-size: 14px;
   min-width: 150px;
   border: 1px solid #d4d4d4;
 
   z-index:1200;
+  font-family: 'Open Sans', Arial, sans-serif;
+  
+}
+
+.d3-context-menu p {
+   font-weight: 800; 
 }
 
 .d3-context-menu ul {
@@ -172,6 +288,7 @@
   margin: 4px 0px;
   padding: 0px;
   cursor: default;
+  
 }
 
 .d3-context-menu ul li {
@@ -208,11 +325,14 @@
   position: absolute;           
   text-align: left;           
   width: 200px;                  
+  /* height: 300px; */
   padding: 4px;             
-  font: 12px sans-serif;        
-  background: lightsteelblue;   
+  font: 16px 'Open Sans', Arial, sans-serif;        
+  background: steelblue;   
+  color: white;
   border: 0px;      
-  border-radius: 8px;           
+  border-radius: 2px;           
+  overflow: visible;
   pointer-events: none; 
    
 }
