@@ -35,8 +35,8 @@
           <h3>Frequency of Popular Terms</h3>
           <form>
           
-            <p><label><input type="radio" name="mode" value="occurance" checked>Number of Posts including Term</label></p>
-            <p><label><input type="radio" name="mode" value="frequency" >Term Frequency Across Module</label></p>
+            <p><label><input type="radio" name="mode" value="postswithterm" checked>Number of Posts including Term</label></p>
+            <p><label><input type="radio" name="mode" value="frequencyacrossmod" >Term Frequency Across Module</label></p>
           
           </form>
         </div>
@@ -183,7 +183,7 @@
 
   var bricktooltiphtml = "";
   var modulename = "modwhydigital";
-  var freqstatus = "frequency";
+  var freqstatus = "postswithterm";
   var titletip = 0;
 
   var treemap = d3.layout.treemap()
@@ -281,7 +281,7 @@
 
 
         d3.selectAll("input").on("change", function change() {
-          var value = this.value === "occurance"
+          var value = this.value === "postswithterm"
               ? function(d) { 
                 if (modulename == "modwhydigital") { return d.modwhydigital; }
                 else if (modulename == "modbusiness") { return d.modbusiness; }
@@ -421,21 +421,21 @@
             if (d.name == "") {}
             else {  
               d3.select(this).attr("r", 20);
-              if (d.title) { titletip = d.title.substr(0,30) + "..."; tipheightbump = 14; } else { titletip = ""; tipheightbump = 0;}
+              if (d.title.length > 3) { titletip = d.title.substr(0,35) + "..."; tipheightbump = 36; } else { titletip = ""; tipheightbump = 0;}
                 div.transition()        
                     .duration(200)      
                     .style("opacity", .9);
                 if(d.likes > 0) {
                   if(d.updates > 0) { 
                       div .html("<b><u>" + d.name + "</u></b></br>" +  titletip  + "</br>"  + "Likes: " + d.likes + "</br>" + "Updates: " + d.updates)
-                      .style("height", (42 + tipheightbump) + "px")
+                      .style("height", (54 + tipheightbump) + "px")
                       .style("left", (d3.event.pageX - 80) + "px" )
                       .style("top", (d3.event.pageY)/1.1 + "px")
                       ;
                   }
                   else {
                       div .html("<b><u>" + d.name + "</u></b></br>" +  titletip + "</br>" + "Likes: " + d.likes)
-                      .style("height", (28 + tipheightbump) + "px")
+                      .style("height", (36 + tipheightbump) + "px")
                       .style("left", (d3.event.pageX - 80) + "px" )
                       .style("top", (d3.event.pageY)/1.1 + "px")
                       ;
@@ -444,7 +444,7 @@
                 else {
                   if(d.updates > 0) {
                        div .html("<b><u>" + d.name + "</u></b></br>" +  titletip + "</br>" + "Updates: " + d.updates)
-                      .style("height", (28 + tipheightbump) + "px")
+                      .style("height", (36 + tipheightbump) + "px")
                       .style("left", (d3.event.pageX - 80) + "px" )
                       .style("top", (d3.event.pageY)/1.1 + "px")
                       ;
@@ -452,7 +452,7 @@
           ///////////////  Hover menu for Radial mainly here ////////////////
                   else {
                       div .html("<b><u>" + d.name + "</u></b></br>" +  titletip)
-                      .style("height", (14 + tipheightbump) + "px")
+                      .style("height", (18 + tipheightbump) + "px")
                       .style("left", (d3.event.pageX - 80) + "px")
                       .style("top", (d3.event.pageY)/1.1 + "px")
                       ;
@@ -480,20 +480,20 @@
         .text(function(d) { return d.name; })
       //attempt at mouseover data on radial
       .on("mouseover", function(d) {      
-             if (d.title) { titletip = d.title.substr(0,30) + "..."; tipheightbump = 14; } else { titletip = ""; tipheightbump = 0;}
+             if (d.title.length > 3) { titletip = d.title.substr(0,35) + "..."; tipheightbump = 36; } else { titletip = ""; tipheightbump = 0;}
               div.transition()        
                   .duration(200)      
                   .style("opacity", .9);
               if(d.likes > 0) {
                 if(d.updates > 0) { 
                     div .html("<b><u>" + d.name + "</u></b></br>" +  titletip  + "</br>"  + "Likes: " + d.likes + "</br>" + "Updates: " + d.updates)
-                    .style("height", (42 + tipheightbump) + "px")
+                    .style("height", (54 + tipheightbump) + "px")
                     .style("left", (d3.event.pageX - 80) + "px" )
                     .style("top", (d3.event.pageY)/1.1 + "px")
                 }
                 else {
                     div .html("<b><u>" + d.name + "</u></b></br>" +  titletip + "</br>" + "Likes: " + d.likes)
-                    .style("height", (28 + tipheightbump) + "px")
+                    .style("height", (36 + tipheightbump) + "px")
                     .style("left", (d3.event.pageX - 80) + "px" )
                     .style("top", (d3.event.pageY)/1.1 + "px")
                 }
@@ -501,13 +501,13 @@
               else {
                 if(d.updates > 0) {
                      div .html("<b><u>" + d.name + "</u></b></br>" +  titletip + "</br>" + "Updates: " + d.updates)
-                    .style("height", (28 + tipheightbump) + "px")
+                    .style("height", (36 + tipheightbump) + "px")
                     .style("left", (d3.event.pageX - 80) + "px" )
                     .style("top", (d3.event.pageY)/1.1 + "px")
                   }
                 else {
                     div .html("<b><u>" + d.name + "</u></b></br>" +  titletip)
-                    .style("height", (14 + tipheightbump) + "px")
+                    .style("height", (18 + tipheightbump) + "px")
                     .style("left", (d3.event.pageX - 80) + "px" )
                     .style("top", (d3.event.pageY)/1.1 + "px")
 
@@ -602,24 +602,24 @@
 
           modulename = this.value;
 
-          if (freqstatus == "occurance") {
+          if (freqstatus == "postswithterm") {
             if (modulename == "modwhydigital") { 
-                d3.select("#brickchart").selectAll(".bricknode").data(treemap.value(function(d) { return d.modallwhydigital; } ).nodes).transition().duration(1500).call(outposition); 
+                d3.select("#brickchart").selectAll(".bricknode").data(treemap.value(function(d) { return d.modwhydigital; } ).nodes).transition().duration(1500).call(outposition); 
                 update(jsonwhydigital);
                 
               }
             else if (modulename == "modbusiness") { 
-                d3.select("#brickchart").selectAll(".bricknode").data(treemap.value(function(d) { return d.modallbusiness; } ).nodes).transition().duration(1500).call(outposition);
+                d3.select("#brickchart").selectAll(".bricknode").data(treemap.value(function(d) { return d.modbusiness; } ).nodes).transition().duration(1500).call(outposition);
                 update(jsonbusiness);
                 
              }
             else if (modulename == "modsummit") { 
-                d3.select("#brickchart").selectAll(".bricknode").data(treemap.value(function(d) { return d.modallsummit; } ).nodes).transition().duration(1500).call(outposition); 
+                d3.select("#brickchart").selectAll(".bricknode").data(treemap.value(function(d) { return d.modsummit; } ).nodes).transition().duration(1500).call(outposition); 
                 update(jsonsummit); 
                 
             }
             else {
-                d3.select("#brickchart").selectAll(".bricknode").data(treemap.value(function(d) { return d.modalldata; } ).nodes).transition().duration(1500).call(outposition); 
+                d3.select("#brickchart").selectAll(".bricknode").data(treemap.value(function(d) { return d.moddata; } ).nodes).transition().duration(1500).call(outposition); 
                 update(jsondata); 
                 
             }
@@ -627,22 +627,22 @@
           }
           else {
             if (modulename == "modwhydigital") { 
-                d3.select("#brickchart").selectAll(".bricknode").data(treemap.value(function(d) { return d.modwhydigital; } ).nodes).transition().duration(1500).call(outposition); 
+                d3.select("#brickchart").selectAll(".bricknode").data(treemap.value(function(d) { return d.modallwhydigital; } ).nodes).transition().duration(1500).call(outposition); 
                 update(jsonwhydigital); 
                 
               }
             else if (modulename == "modbusiness") { 
-                d3.select("#brickchart").selectAll(".bricknode").data(treemap.value(function(d) { return d.modbusiness; } ).nodes).transition().duration(1500).call(outposition); 
+                d3.select("#brickchart").selectAll(".bricknode").data(treemap.value(function(d) { return d.modallbusiness; } ).nodes).transition().duration(1500).call(outposition); 
                 update(jsonbusiness);
                 
               }
             else if (modulename == "modsummit") { 
-                d3.select("#brickchart").selectAll(".bricknode").data(treemap.value(function(d) { return d.modsummit; } ).nodes).transition().duration(1500).call(outposition); 
+                d3.select("#brickchart").selectAll(".bricknode").data(treemap.value(function(d) { return d.modallsummit; } ).nodes).transition().duration(1500).call(outposition); 
                 update(jsonsummit); 
                 
               }
             else {
-              d3.select("#brickchart").selectAll(".bricknode").data(treemap.value(function(d) { return d.moddata; } ).nodes).transition().duration(1500).call(outposition); 
+              d3.select("#brickchart").selectAll(".bricknode").data(treemap.value(function(d) { return d.modalldata; } ).nodes).transition().duration(1500).call(outposition); 
               update(jsondata);
               
               }
